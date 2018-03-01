@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap>
+	<!-- 通过typeAlias使得我们在下面使用Student实体类的时候不需要写包名 -->
+	<typeAlias alias="list" type= "java.util.List"></typeAlias>
+	<typeAlias alias="Point" type="com.champion.crawler.entity.gis.Point"></typeAlias>
+	
+	<resultMap class="Point" id="PointM">
+		<result property="id" column="OBJECTID" jdbcType="int"></result>
+		<result property="Lat" column="GPSLat" jdbcType="varchar"></result>
+		<result property="Lng" column="GPSLon" jdbcType="varchar"></result>
+	</resultMap>
+
+
+	<resultMap class="Point" id="ABCBankPoint">
+		<result property="id" column="branchId"/>
+		<result property="address" column="fullAddress"/>
+	</resultMap>
+	
+	<resultMap class="Point" id="NJQYPoint">
+		<result property="id" column="id"/>
+		<result property="address" column="address"/>
+	</resultMap>
+	
+	<resultMap class="Point" id="PSSPoint">
+		<result property="id" column="apply_num"/>
+		<result property="address" column="address"/>
+	</resultMap>
+	
+	
+	<!-- 这样以后改了sql，就不需要去改java代码了 -->
+	<!-- id表示select里的sql语句，resultClass表示返回结果的类型 -->
+	<select id="selectPoints" resultMap="PointM" >
+		select OBJECTID,GPSLat,GPSLon from poi_oper  where OBJECTID not in (select id from poi) limit 0,200;
+	</select>	
+	
+	<select id="selectPoints2" resultMap="PointM" parameterClass="int">
+		select OBJECTID,GPSLat,GPSLon from poi_oper order by  OBJECTID  limit #from#,200;
+	</select>		
+	
+	<select id="selectABCBankPoints" resultMap="ABCBankPoint" parameterClass="int">
+		select branchId , fullAddress from enterprise_abchina_info   where lat is null order by  branchId  limit #from#,200;
+	</select>		
+	
+	<select id="selectNJQYPoints" resultMap="NJQYPoint" parameterClass="int">
+		select id, address from com_address   where lat is null   limit #from#,200;
+	</select>	
+	
+	<select id="selectPssPoints" resultMap="PSSPoint" parameterClass="int">
+		select id, address from pss_detail   where lat is null   limit #from#,200;
+	</select>	
+	
+	<select id="selectPoiCount" resultClass="java.lang.Integer" >
+		select count(1) as value from poi;
+	</select>		
+	
+	<update id="updatePoint" parameterClass="Point">
+		update poi_oper set	GPSLat=#Lat#,GPSLon=#Lng# where OBJECTID=#id#;
+	</update>
+	
+	<update id="updateNJQYPoint" parameterClass="Point">
+		update com_address t set t.lat =#Lat#,t.lon= #Lng# where id=#id#;
+	</update>
+	
+	<update id="updatePssPoint" parameterClass="Point">
+		update pss_detail t set t.lat =#Lat#,t.lon= #Lng# where id=#id#;
+	</update>
+	
+	
+	<update id="updateABCBankPoint" parameterClass="Point">
+		update enterprise_abchina_info t set t.lat =#Lat#,t.lon= #Lng# where branchId=#id#;
+	</update>
+	
+	<insert id="addPoints" parameterClass="list" >
+		insert into poi(id,lat,lon
+		) values
+		<iterate conjunction=",">
+		  (#[].id#,#[].Lat#,#[].Lng#)
+		</iterate>		
+	</insert>
+		
+</sqlMap>

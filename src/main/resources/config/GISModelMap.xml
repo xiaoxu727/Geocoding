@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap>
+	<!-- 通过typeAlias使得我们在下面使用Student实体类的时候不需要写包名 -->
+	<typeAlias alias="list" type= "java.util.List"></typeAlias>
+	<typeAlias alias="Point" type="com.champion.crawler.entity.gis.Point"></typeAlias>
+	
+	<resultMap class="Point" id="PointM">
+		<result property="id" column="id" jdbcType="int"></result>
+		<result property="lat" column="lat" jdbcType="varchar"></result>
+		<result property="lng" column="lng" jdbcType="varchar"></result>
+		<result property="address" column="address" jdbcType="varchar"></result>
+	</resultMap>
+		
+	<!-- 这样以后改了sql，就不需要去改java代码了 -->
+	<!-- id表示select里的sql语句，resultClass表示返回结果的类型 -->
+	<select id="selectPoints" resultMap="PointM" parameterClass="int" >
+		select id,lat,lng,address from t_geocoding  where lat is null and lng is null  limit #from#,200;
+	</select>	
+	
+	<update id="updatePoint" parameterClass="Point">
+		update t_geocoding set lat=#lat#, lng=#lng# where id=#id#;
+	</update>
+
+	<insert id="addPoints" parameterClass="list" >
+		insert into t_geocoding(id,lat,lng
+		) values
+		<iterate conjunction=",">
+		  (#[].id#,#[].lat#,#[].lng#)
+		</iterate>		
+	</insert>
+		
+</sqlMap>

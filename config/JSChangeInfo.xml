@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap>
+	<!-- 通过typeAlias使得我们在下面使用Student实体类的时候不需要写包名 -->
+	<typeAlias alias="JSChangeInfo" type="com.champion.crawler.JS.dao.JSChangeInfo"/>
+	<typeAlias alias="list" type= "java.util.List"></typeAlias>	
+	<insert id="addJSChangeInfos" parameterClass="list" >
+		insert into js_change_info( enterprise_registration_number,
+changen_matters,
+change_content,
+change_content_after,
+change_date
+ ) values
+		<iterate conjunction=",">
+		  (#[].enterpriseRegistrationNumber#,#[].changenMatters#,#[].changeContent#,#[].changeContentAfter#,#[].changeDate#)
+		</iterate>		
+	</insert>
+	
+</sqlMap>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap>
+	<!-- 通过typeAlias使得我们在下面使用Student实体类的时候不需要写包名 -->
+	<typeAlias alias="JSEquityRegistrationInfo" type="com.champion.crawler.JS.dao.JSEquityRegistrationInfo"/>
+	<typeAlias alias="list" type= "java.util.List"></typeAlias>	
+	
+	<insert id="addJSEquityRegistrationInfos" parameterClass="list" >
+		insert into js_equity_registration_info( 
+	enterprise_registration_number,
+	serial_number,
+	registration_number,
+	pledgor,
+	pledgor_lisence,
+	amount_of_equityShares,
+	pledgee,
+	pledgee_lisence,
+	registration_date,
+	state,
+	change_situation
+) values
+		<iterate conjunction=",">		  (#[].enterpriseRegistrationNumber#,#[].serialNumber#,#[].registrationNumber#,#[].pledgor#,#[].pledgorLisence#,#[].amountOfEquityShares#,#[].pledgee#,#[].pledgeeLisence#,#[].registrationDate#,#[].state#,#[].changeSituation#)
+		</iterate>		
+	</insert>
+</sqlMap>

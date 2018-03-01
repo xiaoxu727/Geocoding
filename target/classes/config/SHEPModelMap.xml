@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap>
+	<typeAlias alias = "SHCompanyModel" type ="com.champion.crawler.entity.sh.model.SHCompanyModel"></typeAlias>
+	<typeAlias alias ="EPAdministrativeLicensingInfo" type="com.champion.crawler.entity.sh.ep.model.EPAdministrativeLicensingInfo"></typeAlias>
+	<typeAlias alias = "EPAdministrativePenaltyInfo" type = "com.champion.crawler.entity.sh.ep.model.EPAdministrativePenaltyInfo"></typeAlias>
+	<typeAlias alias = "EPChangeInfo" type = "com.champion.crawler.entity.sh.ep.model.EPChangeInfo"></typeAlias>
+	<typeAlias alias = "EPEnterpriseAnnualReport" type = "com.champion.crawler.entity.sh.ep.model.EPEnterpriseAnnualReport"></typeAlias>
+	<typeAlias alias = "EPIntellectualPropertyRightRegistrationInfo" type = "com.champion.crawler.entity.sh.ep.model.EPIntellectualPropertyRightRegistrationInfo"></typeAlias>
+	<typeAlias alias = "EPEquityChangeInfo" type = "com.champion.crawler.entity.sh.ep.model.EPEquityChangeInfo"></typeAlias>
+	<typeAlias alias = "EPReportChangeInfo" type = "com.champion.crawler.entity.sh.ep.model.EPReportChangeInfo"></typeAlias>
+	<typeAlias alias = "EPReportEnterpriseAsset" type = "com.champion.crawler.entity.sh.ep.model.EPReportEnterpriseAsset"></typeAlias>
+	<typeAlias alias = "EPReportEnterpriseBaseInfo" type = "com.champion.crawler.entity.sh.ep.model.EPReportEnterpriseBaseInfo"></typeAlias>
+	<typeAlias alias = "EPReportEquityChangeInfo" type = "com.champion.crawler.entity.sh.ep.model.EPReportEquityChangeInfo"></typeAlias>
+	<typeAlias alias = "EPReportGuaranteeInfo" type = "com.champion.crawler.entity.sh.ep.model.EPReportGuaranteeInfo"></typeAlias>
+	<typeAlias alias = "EPReportInvestInfo" type = "com.champion.crawler.entity.sh.ep.model.EPReportInvestInfo"></typeAlias>
+	<typeAlias alias = "EPReportShareHolder" type = "com.champion.crawler.entity.sh.ep.model.EPReportShareHolder"></typeAlias>
+	<typeAlias alias = "EPReportWebSite" type = "com.champion.crawler.entity.sh.ep.model.EPReportWebSite"></typeAlias>
+	<typeAlias alias = "EPReportProductOperation" type = "com.champion.crawler.entity.sh.ep.model.EPReportProductOperation"></typeAlias>
+	<typeAlias alias = "EPShareHolder" type = "com.champion.crawler.entity.sh.ep.model.EPShareHolder"></typeAlias>
+	<typeAlias alias="list" type= "java.util.List"></typeAlias>	
+	
+	<resultMap class="SHCompanyModel" id="CompanyInfoM">	
+		<result property="name" column="name" jdbcType="varchar"></result>
+		<result property="registrationNumber" column="registration_number" jdbcType="varchar"></result>
+		<result property="url" column="url" jdbcType="varchar"></result>					
+	</resultMap>
+	
+	<resultMap class ="EPEnterpriseAnnualReport" id = "EPEnterpriseAnnualReportM">
+		<result property = "id" column ="id" jdbcType = "varchar"></result>
+		<result property = "enterpriseRegistrationNumber" column ="enterprise_registration_number" jdbcType = "varchar"></result>
+		<result property = "releaseDate" column ="release_date" jdbcType = "varchar"></result>
+		<result property = "reportUrl" column ="report_url" jdbcType = "varchar"></result>
+		<result property = "serailNumber" column ="serail_number" jdbcType = "varchar"></result>
+		<result property = "submittedYear" column ="submitted_year" jdbcType = "varchar"></result>
+	</resultMap>
+	
+	<select id="selectReportForParse" resultMap="EPEnterpriseAnnualReportM" parameterClass="int">
+	 select * from ep_enterprise_annual_report t where t.id not in (select reportId from  ep_report_enterprise_base_info) and report_url like 'http%' limit #start#,50
+	</select>	
+	
+	<select id="selectNextSHEPCompanysParser"  resultMap="CompanyInfoM">
+	select registration_num,name,url from company_info_done where name not in (select name from ep_searched_record) and url like 'http%' limit "${from}",20	
+	</select>
+	
+	<insert id="addEPAdministrativeLicensingInfos" parameterClass="list" >
+		insert ep_administrative_licensing_information(enterprise_registration_number,serial_number,license_file_number,license_file_name,validity_period_from, validity_period_to,licensing_authority,licensing_content,state,detial_url) VALUES
+		<iterate conjunction=",">	
+			  (#[].enterpriseRegistrationNumber#,#[].serialNumber#,#[].licenseFileNumber#,#[].licenseFileName#,#[].validityPeriodFrom#,#[].validityPeriodTo#,#[].licensingAuthority#,#[].licensingContent#,
+			  #[].state#,#[].detialUrl#)
+		</iterate>		
+	</insert>
+	
+	<insert id = "addEPAdministrativePenaltyInfos" parameterClass = "list">
+		insert into ep_administrative_penalty_information(enterprise_registration_number,serial_number,decision_number,illegal_type,content_administrative_penalty,determine_org,decision_date,detail_url,remarks) VALUES
+		<iterate conjunction=",">
+			(#[].enterpriseRegistrationNumber#,
+			#[].serialNumber#,
+			#[].decisionNumber#,
+			#[].illegalType#,
+			#[].contentAdministrativePenalty#,
+			#[].determineOrg#,
+			#[].decisionDate#,
+			#[].detailUrl#,
+			#[].remarks#)
+		</iterate>
+	</insert>
+	
+	<insert id = "addEPChangeInfos" parameterClass = "list">
+		insert into ep_change_information(enterparise_registration_number,serial_number,changen_matters,change_content,change_content_after,change_date) VALUES
+		<iterate conjunction=",">
+			(#[].enterpriseRegistrationNumber#,
+			#[].serialNumber#,
+			#[].changenMatters#,
+			#[].changeContent#,
+			#[].changeContentAfter#,
+			#[].changeDate#)
+		</iterate>
+	</insert>
+	
+	<insert id = "addEPEnterpriseAnnualReports" parameterClass = "list">
+		insert into ep_enterprise_annual_report(enterprise_registration_number,serail_number,submitted_year,report_url,release_date) VALUES
+		<iterate conjunction=",">
+			(#[].enterpriseRegistrationNumber,#[].serialNumber#,#[].submittedYear#,#[].reportUrl#,#[].releaseDate#)
+		</iterate>
+	</insert>
+	
+	<insert id = "addEPIntellectualPropertyRightRegistrationInfos" parameterClass = "list">
+		INSERT into ep_intellectual_property_right_registration_information(enterprise_registration_number,serail_number,registration_number,name,type,pledgor,pledgee,pledge_registration_deadline,state,changes) VALUES
+		<iterate conjunction=",">
+			(#[].enterpriseRegistrationNumber#,
+			#[].serialNumber#,
+			#[].registrationNumber#,
+			#[].name#,
+			#[].type#,
+			#[].pledgor#,
+			#[].pledgee#,
+			#[].pledgeRegistrationDeadline#,
+			#[].state#,
+			#[].changes#)
+		</iterate>
+	</insert>
+	
+	
+	<insert id = "addEPEquityChangeInfos" parameterClass = "list">
+		INSERT into ep_equity_change_information(enterprise_registration_number,serial_number,share_holder_name,proportion_shares_former,proportion_shares_after,change_date) VALUES
+		<iterate conjunction=",">
+			(#[].enterpriseRegistrationNumber,#[].serialNumber#,#[].shareHolderName#,#[].proportionSharesFormer#,#[].proportionSharesAfter#,#[].changeDate#)
+		</iterate>
+	</insert>
+	
+	<insert id = "addEPReportChangeInfos" parameterClass = "list">
+		INSERT into ep_report_change_info(report_id,
+		serail_number,
+change_content,
+change_befor,
+chaghe_after,
+change_date
+) VALUES
+		<iterate conjunction=",">
+			(#[].reportID#,
+			#[].serailNumber#,
+			#[].changeContent#,
+			#[].changeBefor#,
+			#[].chagheAfter#,
+			#[].changeDate#)
+		</iterate>
+	</insert>
+
+	<insert id = "addEPReportEnterpriseAssets" parameterClass = "list">
+		INSERT into ep_report_enterprise_asset(report_id,
+total_asset,
+total_owner_equity,
+total_revenue,
+total_profit,
+main_business_revenue,
+net_profit,
+total_tax_payment,
+total_liability
+
+) VALUES
+		<iterate conjunction=",">
+			(#[].reportID#,
+			#[].totalAsset#,
+			#[].totalOwnerEquity#,
+			#[].totalRevenue#,
+			#[].totalProfit#,
+			#[].mainBusinessRevenue#,
+			#[].netProfit#,
+			#[].totalTaxPayment#,
+			#[].totalLiability#)
+		</iterate>
+	</insert>
+	
+	
+		<insert id = "addEPReportEnterpriseBaseInfos" parameterClass = "list">
+		INSERT into ep_report_enterprise_base_info(reportId,
+company_registration_number,
+company_name,
+tel,
+zip_code,
+address,
+email,
+is_equitity_changed,
+state,
+is_has_site,
+is_invest,
+employee_number,
+sub_relationship
+) VALUES
+		<iterate conjunction=",">
+			(#[].reportId#,
+			#[].companyRegistrationNumber#,
+			#[].companyName#,
+			#[].tel#,
+			#[].zipCode#,
+			#[].address#,
+			#[].email#,
+			#[].isEquitityChanged#,
+			#[].state#,
+			#[].isHasSite#,
+			#[].isInvest#,
+			#[].employeeNumber#,
+			#[].subRelationship#)
+		</iterate>
+	</insert>
+	
+	
+	<insert id = "addEPReportEquityChangeInfos" parameterClass = "list">
+		INSERT into ep_report_equity_change_info(report_id,
+share_holder_name,
+proportion_shares_former,
+proportion_shares_after,
+change_date
+
+) VALUES
+		<iterate conjunction=",">
+			(#[].reportId#,
+			#[].shareHolderName#,
+			#[].proportionSharesFormer#,
+			#[].proportionSharesAfter#,
+			#[].changeDate#)
+		</iterate>
+	</insert>
+	
+	
+	<insert id = "addEPReportGuaranteeInfos" parameterClass = "list">
+		INSERT INTO  ep_report_guarantee_info(report_id,
+creditor,
+obligor,
+creditor_type,
+amount_debt,
+debt_period,
+gurantee_period,
+guarantee_way,
+gurantee_scope
+) VALUES
+		<iterate conjunction=",">
+			(#[].reportID#,
+			#[].creditor#,
+			#[].obligor#,
+			#[].creditorType#,
+			#[].amountDebt#,
+			#[].debtPeriod#,
+			#[].guranteePeriod#,
+			#[].guaranteeWay#,
+			#[].guranteeScope#)
+		</iterate>
+	</insert>
+	
+	<insert id = "addEPReportInvestInfos" parameterClass = "list">
+		INSERT into ep_report_invest_info(report_id,
+invest_dept,
+registraton_number
+
+) VALUES
+		<iterate conjunction=",">
+			(#[].reportID#,
+			#[].investDept#,
+			#[].registratonNumber#)
+		</iterate>
+	</insert>
+	
+	<insert id = "addEPReportShareHolders" parameterClass = "list">
+		INSERT into ep_report_share_holder(report_ID,
+name,
+subscribed_way,
+subscribed_captial,
+subscribed_captial_date,
+paid_investment_mode,
+paid_up_investment_amount,
+paid_investment_date
+
+) VALUES
+		<iterate conjunction=",">
+			(#[].reportID#,
+			#[].name#,	
+			#[].subscribedWay#,
+			#[].subscribedCaptial#,
+			#[].subscribedCaptialDate#,
+			#[].paidInvestmentMode#,
+			#[].paidUpInvestmentAmount#,
+			#[].paidInvestmentDate#)
+		</iterate>
+	</insert> 
+	<insert id = "addEPReportProductOperations" parameterClass = "list">
+		INSERT into ep_report_product_operation(report_id,
+main_business_revenue,
+toal_tax,
+net_profit
+) VALUES
+		<iterate conjunction=",">
+			(#[].reportId#,
+			#[].mainBusinessRevenue#,
+			#[].toalTax#,
+			#[].netProfit#)
+		</iterate>
+	</insert>
+	
+	<insert id = "addEPReportWebSites" parameterClass = "list">
+		INSERT into ep_report_web_site(report_Id,
+type,
+name,
+url
+
+) VALUES
+		<iterate conjunction=",">
+			(#[].reportId#,
+			#[].type#,
+			#[].name#,
+			#[].url#)
+		</iterate>
+	</insert>
+	
+	<insert id = "addEPShareHolders" parameterClass = "list">
+		INSERT into ep_share_holder(enterprise_registration_number,name,subscribed_amount,paid_up_amount,subscribed_way,subscribed_captial,subscribed_captial_date,paid_investment_mode,paid_up_investment_amount,paid_investment_date,detail_url) VALUES
+
+) VALUES
+		<iterate conjunction=",">
+			(#[].enterpriseRegistrationNumber#,
+			#[].name#,
+			#[].subscribedAmount#,
+			#[].paidUpAmount#,
+			#[].subscribedWay#,
+			#[].subscribedCaptial#,
+			#[].subscribedCaptialDate#,
+			#[].paidInvestmentMode#,
+			#[].paidUpInvestmentAmount#,
+			#[].paidInvestmentDate#,
+			#[].detailUrl#)
+		</iterate>
+	</insert>
+	
+	
+</sqlMap>

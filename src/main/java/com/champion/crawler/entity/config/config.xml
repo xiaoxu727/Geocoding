@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<app>
+<appName>Champion Crawler</appName>
+</app>
+
+<FileInfo>
+	<!-- 上市公司pdf文件保存 的位置 -->
+	<perodicReportFilePath>D:\\PerodicReport</perodicReportFilePath>
+	<!--处理数据路径-->
+	<dataFile>
+		<filePath>Crawler\\data.txt</filePath>
+	</dataFile>
+	<!--抓屏图片路径-->
+	<pageCaptureFile>
+		<filePath>Crawler\\test.jpg</filePath>
+	</pageCaptureFile>
+	<!-- 剪切验证码路径 -->
+	<verficationFile>
+		<filePath>Crawler\\icon.jpg</filePath>
+	</verficationFile>
+	<!-- 数据结果路径 -->
+	<resultFile>
+		<filePath>Crawler\\result.txt</filePath>
+	</resultFile>
+	<!-- 记录数据处理数量路径 -->
+	<countFile>
+		<filePath>Crawler\\lineCount.txt</filePath>
+	</countFile>
+</FileInfo>
+ 
+<XPath>
+	<reultUrl>body>div:eq(4)>div>div:eq(2)>div>div:eq(0)>a</reultUrl>
+	<noData>.list-stat</noData>
+	<erroBtn>.ui-button-text-only</erroBtn>
+	<keyword>#keyword</keyword>
+	<imagPath>.ui-dialog</imagPath>
+</XPath>
+<!-- 下一个处理对象所在的位置 -->
+<nextCompany>
+	<number>0</number>
+</nextCompany>
+<DatabaseInfo>
+<!-- localhost:3306 -->
+ <!--<url>jdbc:mysql://192.168.1.40:3306/credit-web-crawler?user=apps&password=apps&useUnicode=true&characterEncoding=UTF8</url>  -->
+		
+<keywordDBUrl>jdbc:mysql://localhost:3306/zh_0925?user=champion&password=champion&useUnicode=true&characterEncoding=UTF8</keywordDBUrl>
+ <url>jdbc:mysql://localhost:3306/credit-web-crawler?user=champion&password=champion&useUnicode=true&characterEncoding=UTF8</url>
+ <driver>com.mysql.jdbc.Driver</driver>
+</DatabaseInfo>
+
+
