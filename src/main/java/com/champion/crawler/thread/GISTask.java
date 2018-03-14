@@ -17,4 +17,8 @@ public class GISTask implements Runnable {
 		
 	}
 
+	public static void main(String[] args){
+		GISParse parse = new GISParse();
+		parse.geocoding(0, GISParse.BAIDU_TYPE);
+	}
 }

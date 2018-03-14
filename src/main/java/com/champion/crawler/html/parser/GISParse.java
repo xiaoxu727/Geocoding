@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 import com.champion.crawler.convert.JsonHelper;
 import com.champion.crawler.entity.gis.GISImpl;
 import com.champion.crawler.entity.gis.Point;
+import com.google.gson.*;
 
 
 public class GISParse extends Parser {
@@ -99,21 +100,30 @@ public class GISParse extends Parser {
 				sb.append(res.trim());
 			}
 			String str = sb.toString();
+
+			str = str.replace("showLocation&&showLocation(","").replace(")","");
+			JsonParser jsonParser = new JsonParser();
+			JsonElement element = jsonParser.parse(str);
+			int status = element.getAsJsonObject().get("status").getAsInt();
 			Map<String,String> map = null;
-			if(str!=null){
-				int lngStart = str.indexOf("lng\":");
-				int lngEnd = str.indexOf(",\"lat");
-				int latEnd = str.indexOf("},\"precise");
-				if(lngStart > 0 && lngEnd > 0 && latEnd > 0){
-					String lng = str.substring(lngStart+5, lngEnd);
-					String lat = str.substring(lngEnd+7, latEnd);
-					map = new HashMap<String,String>();
-					map.put("lng", lng);
-					map.put("lat", lat);
-					map.put("latLngType",BAIDU_TYPE);
-					return map;
-				}
+			if(status == 0 ){
+				map = new HashMap<String,String>();
+				JsonElement resultElement = element.getAsJsonObject().get("result");
+				JsonElement locationElement = resultElement.getAsJsonObject().get("location");
+				String lng = locationElement.getAsJsonObject().get("lng").getAsString();
+				String lat = locationElement.getAsJsonObject().get("lat").getAsString();
+				String precise = resultElement.getAsJsonObject().get("precise").getAsString();
+				String confidence = resultElement.getAsJsonObject().get("confidence").getAsString();
+				String level = resultElement.getAsJsonObject().get("level").getAsString();
+				map.put("lng", lng);
+				map.put("lat", lat);
+				map.put("precise", precise);
+				map.put("confidence", confidence);
+				map.put("level", level);
+				map.put("latLngType",BAIDU_TYPE);
+				return map;
 			}
+
 		}catch (Exception e) {
 			e.printStackTrace();
 		}finally{
@@ -210,6 +220,9 @@ public class GISParse extends Parser {
 					}else {
 						pointNew.setLat(json.get("lat"));
 						pointNew.setLng(json.get("lng"));
+						pointNew.setConfidence(json.get("confidence"));
+						pointNew.setLevel(json.get("level"));
+						pointNew.setPrecise(json.get("precise"));
 					}
 					pointNew.setLatLngType(latLngType);
 				}
@@ -243,8 +256,12 @@ public class GISParse extends Parser {
 					}else {
 						pointNew.setLat(json.get("lat"));
 						pointNew.setLng(json.get("lng"));
+						pointNew.setConfidence(json.get("confidence"));
+						pointNew.setLevel(json.get("level"));
+						pointNew.setPrecise(json.get("precise"));
 					}
 					pointNew.setLatLngType(latLngType);
+
 				}
 				GISImpl.updatePoint(pointNew);
 				Console cons = System.console();

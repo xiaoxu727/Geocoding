@@ -6,7 +6,34 @@ public class Point {
 	public String lat;
 	public String lng;
 	public String address;
+	public String precise;
+	public String confidence;
+	public String level;
 	public String latLngType;
+
+	public String getConfidence() {
+		return confidence;
+	}
+
+	public void setConfidence(String confidence) {
+		this.confidence = confidence;
+	}
+
+	public String getLevel() {
+		return level;
+	}
+
+	public void setLevel(String level) {
+		this.level = level;
+	}
+
+	public String getPrecise() {
+		return precise;
+	}
+
+	public void setPrecise(String precise) {
+		this.precise = precise;
+	}
 
 	public String getLatLngType() {
 		return latLngType;

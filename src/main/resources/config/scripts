@@ -1,0 +1,13 @@
+CREATE TABLE `t_geocoding` (
+  `id` varchar(255) DEFAULT NULL,
+  `cname` varchar(255) DEFAULT NULL,
+  `area` varchar(255) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `lat` varchar(30) DEFAULT NULL,
+  `lng` varchar(30) DEFAULT NULL,
+  `lat_lng_type` varchar(10) DEFAULT NULL,
+  `precise` varchar(5) DEFAULT NULL COMMENT '位置的附加信息，是否精确查找。1为精确查找，即准确打点；0为不精确，即模糊打点（模糊打点无法保证准确度，不建议使用）。',
+  `confidence` varchar(5) DEFAULT NULL COMMENT '可信度，描述打点准确度，大于80表示误差小于100m。该字段仅作参考，返回结果准确度主要参考precise参数。	',
+  `level` varchar(10) DEFAULT NULL COMMENT '能精确理解的地址类型，包含：UNKNOWN、国家、省、城市、区县、乡镇、村庄、道路、地产小区、商务大厦、政府机构、交叉路口、商圈、生活服务、休闲娱乐、餐饮、宾馆、购物、金融、教育、医疗 、工业园区 、旅游景点 、汽车服务、火车站、长途汽车站、桥 、停车场/停车区、港口/码头、收费区/收费站、飞机场 、机场 、收费处/收费站 、加油站、绿地、门址'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

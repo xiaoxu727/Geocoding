@@ -11,16 +11,20 @@
 		<result property="lat" column="lat" jdbcType="varchar"></result>
 		<result property="lng" column="lng" jdbcType="varchar"></result>
 		<result property="address" column="address" jdbcType="varchar"></result>
+		<result property="precise" column="precise" jdbcType="varchar"></result>
+		<result property="confidence" column="confidence" jdbcType="varchar"></result>
+		<result property="level" column="level" jdbcType="varchar"></result>
+
 	</resultMap>
 		
 	<!-- 这样以后改了sql，就不需要去改java代码了 -->
 	<!-- id表示select里的sql语句，resultClass表示返回结果的类型 -->
 	<select id="selectPoints" resultMap="PointM" parameterClass="int" >
-		select id,lat,lng,address from t_geocoding  where lat is null and lng is null  limit #from#,200;
+		select id,lat,lng,address,precise, confidence,level from t_geocoding  where lat is null or lng is null  or lat = '' and lng = ''  limit #from#,200;
 	</select>	
 	
 	<update id="updatePoint" parameterClass="Point">
-		update t_geocoding set lat=#lat#, lng=#lng# where id=#id#;
+		update t_geocoding set lat=#lat#, lng=#lng#, precise=#precise#, confidence=#confidence#, level=#level# where id=#id#;
 	</update>
 
 	<insert id="addPoints" parameterClass="list" >
